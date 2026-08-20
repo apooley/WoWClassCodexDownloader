@@ -31,12 +31,12 @@ The script uses only Python's standard library, so no additional packages are re
 
 ## Configuration
 
-Open `classcodex_downloader.py` and set `ADDONS_PATH` to your World of Warcraft `AddOns` folder.
+Open `download_classcodex.py` and set `ADDONS_PATH` to your World of Warcraft `AddOns` folder.
 
 ## Usage
 Run the script from a terminal:
 ```bash
-python classcodex_downloader.py
+python download_classcodex.py
 ```
 
 ## Dry Run
