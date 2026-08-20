@@ -1,10 +1,6 @@
 # WoW ClassCodex Addon Downloader
-A downloader script for the ClassCodex Addon for World of Warcraft.
 
-This repository provides the script for downloading and ClassCodex Addon.
-
-Usage
-Download the script and follow the instructions provided in the repository.
+This repository provides a downloader script for the ClassCodex Addon for World of Warcraft.
 
 # ClassCodex Downloader
 
