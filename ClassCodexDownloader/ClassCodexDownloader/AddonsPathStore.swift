@@ -4,16 +4,13 @@ struct AddonsPathStore {
     static let key = "addonsPath"
 
     private let defaults: UserDefaults
-    private let fileManager: FileManager
     private let locateRetailAddOns: () -> URL?
 
     init(
         defaults: UserDefaults = .standard,
-        fileManager: FileManager = .default,
         locateRetailAddOns: @escaping () -> URL? = { WowInstallLocator.locateRetailAddOns() }
     ) {
         self.defaults = defaults
-        self.fileManager = fileManager
         self.locateRetailAddOns = locateRetailAddOns
     }
 
@@ -24,8 +21,15 @@ struct AddonsPathStore {
 
     func resolvedInitialPath() -> String {
         let stored = path.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !stored.isEmpty, isDirectory(stored) {
-            return stored
+        if !stored.isEmpty,
+           let resolved = WowInstallLocator.resolveRetailAddOns(
+            from: URL(fileURLWithPath: stored, isDirectory: true)
+           ) {
+            let resolvedPath = resolved.path
+            if resolvedPath != stored {
+                path = resolvedPath
+            }
+            return resolvedPath
         }
         if let located = locateRetailAddOns() {
             let locatedPath = located.path
@@ -35,9 +39,12 @@ struct AddonsPathStore {
         return ""
     }
 
-    private func isDirectory(_ path: String) -> Bool {
-        var isDirectory: ObjCBool = false
-        return fileManager.fileExists(atPath: path, isDirectory: &isDirectory)
-            && isDirectory.boolValue
+    func normalizeAndStore(_ selected: URL) -> String? {
+        guard let resolved = WowInstallLocator.resolveRetailAddOns(from: selected) else {
+            return nil
+        }
+        let resolvedPath = resolved.path
+        path = resolvedPath
+        return resolvedPath
     }
 }

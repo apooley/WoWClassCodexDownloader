@@ -79,6 +79,50 @@ enum WowInstallLocator {
         return nil
     }
 
+    /// Resolves a user-chosen or stored path (install root, `_retail_`, `Interface`, `.app`, or AddOns)
+    /// into the retail `Interface/AddOns` folder when that folder exists.
+    static func resolveRetailAddOns(from url: URL) -> URL? {
+        resolveRetailAddOns(from: url, isDirectory: isDirectory(_:))
+    }
+
+    static func resolveRetailAddOns(
+        from url: URL,
+        isDirectory: (URL) -> Bool
+    ) -> URL? {
+        let standardized = url.standardizedFileURL
+
+        if standardized.pathExtension.lowercased() == "app" {
+            return addOnsFolder(fromWowApplication: standardized, isDirectory: isDirectory)
+        }
+
+        if isRetailAddOnsFolder(standardized), isDirectory(standardized) {
+            return standardized
+        }
+
+        let candidates: [URL]
+        switch standardized.lastPathComponent {
+        case "Interface":
+            candidates = [
+                standardized.appendingPathComponent("AddOns", isDirectory: true)
+            ]
+        case retailFolderName:
+            candidates = [addOnsFolder(inRetail: standardized)]
+        default:
+            candidates = [
+                addOnsFolder(inRetail: retailFolder(inInstallRoot: standardized)),
+                addOnsFolder(inRetail: standardized)
+            ]
+        }
+
+        for candidate in candidates {
+            let resolved = candidate.standardizedFileURL
+            if isRetailAddOnsFolder(resolved), isDirectory(resolved) {
+                return resolved
+            }
+        }
+        return nil
+    }
+
     static func defaultSearchRoots() -> [URL] {
         var roots: [URL] = [
             URL(fileURLWithPath: "/Applications", isDirectory: true),

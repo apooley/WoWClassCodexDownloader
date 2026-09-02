@@ -1,1 +1,5 @@
 /dist
+/.codex
+.DS_Store
+/.cursor
+/.vscode

@@ -32,7 +32,7 @@ struct ContentView: View {
             }
 
             if addonsPath.isEmpty {
-                Text("World of Warcraft (retail) was not found. Choose Interface/AddOns manually.")
+                Text("World of Warcraft (retail) was not found. Choose the WoW folder or Interface/AddOns.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -83,13 +83,16 @@ struct ContentView: View {
         panel.canChooseDirectories = true
         panel.allowsMultipleSelection = false
         panel.canCreateDirectories = false
-        panel.message = "Select your World of Warcraft Interface/AddOns folder."
+        panel.message = "Select World of Warcraft, or the retail Interface/AddOns folder."
         if !addonsPath.isEmpty {
             panel.directoryURL = URL(fileURLWithPath: addonsPath, isDirectory: true)
         }
         guard panel.runModal() == .OK, let url = panel.url else { return }
-        addonsPath = url.path
-        pathStore.path = url.path
+        if let resolved = pathStore.normalizeAndStore(url) {
+            addonsPath = resolved
+        } else {
+            footer = "That folder is not a retail World of Warcraft AddOns location."
+        }
     }
 
     private func startUpdate() {
